@@ -20,7 +20,7 @@ int main() {
         v.push_back(n1);
     }
 
-    v.erase(unique(v.begin(),v.end()),v.end());
+    //v.erase(unique(v.begin(),v.end()),v.end());
 
     for(int i =0;i<v.size();i++){
         ll target = k - v[i];
