@@ -27,7 +27,7 @@ int main() {
         if(um.find(target) != um.end()){
             answer += um[target];
             um[target] = 0;
-            um[v[i]] =0;
+            um[v[i]]--;
         }
         
     }
