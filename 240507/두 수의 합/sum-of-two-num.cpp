@@ -26,7 +26,7 @@ int main() {
         ll target = k - v[i];
         if(um.find(target) != um.end()){
             answer += um[target];
-            um[target] = 0;
+            //um[target]--;
             um[v[i]]--;
         }
         
