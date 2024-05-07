@@ -25,9 +25,10 @@ int main() {
     for(int i =0;i<v.size();i++){
         ll target = k - v[i];
         if(um.find(target) != um.end()){
+            um[v[i]]--;
+
             answer += um[target];
             //um[target]--;
-            um[v[i]]--;
         }
         
     }
