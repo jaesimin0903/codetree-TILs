@@ -28,6 +28,7 @@ int main() {
     });
 
     for(int i =0;i<k;i++){
+        if(i >= v.size()) break;
         cout << v[i].first << " ";
     }
     
