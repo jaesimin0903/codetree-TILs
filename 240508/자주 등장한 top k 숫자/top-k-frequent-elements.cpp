@@ -27,8 +27,8 @@ int main() {
         return a.first > b.first;
     });
 
-    for(int i =0;i<v.size();i++){
-        if(v[i].second >= k) cout << v[i].first << " " ;
+    for(int i =0;i<k;i++){
+        cout << v[i].first << " ";
     }
     
     return 0;
