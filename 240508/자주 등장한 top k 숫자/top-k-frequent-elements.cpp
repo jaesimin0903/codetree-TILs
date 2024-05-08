@@ -18,7 +18,7 @@ int main() {
         arr[n1]++;
     }
 
-    for(int i =0;i<100010;i++){
+    for(int i =0;i<100000;i++){
         if(arr[i] != 0)v.push_back({i,arr[i]});
     }
 
