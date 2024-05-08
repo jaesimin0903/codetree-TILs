@@ -3,23 +3,23 @@
 #include <vector>
 #include <algorithm>
 int n, k;
-
+typedef long long ll;
 using namespace std;
 int arr[100010];
-unordered_map<int,int> um;
-vector<pair<int,int>> v;
+unordered_map<ll,ll> um;
+vector<pair<ll,ll>> v;
 int main() {
     // 여기에 코드를 작성해주세요.
     cin >> n >> k;
 
     while(n--){
-        int n1;
+        ll n1;
         cin >> n1;
-        arr[n1]++;
+        um[n1]++;
     }
 
-    for(int i =0;i<100000;i++){
-        if(arr[i] != 0)v.push_back({i,arr[i]});
+    for(auto &val : um){
+        v.push_back(val);
     }
 
     sort(v.begin(), v.end(), [](const auto&a, const auto&b){
