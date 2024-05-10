@@ -60,7 +60,7 @@ int main() {
         ll target = -val.first;
         //cout << target <<"\n";
         if(um2.find(target) != um2.end()){
-            answer+=um2[target];
+            answer+=val.second * um2[target];
             val.second--;
         }
     }
