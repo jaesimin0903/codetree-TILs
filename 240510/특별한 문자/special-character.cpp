@@ -26,11 +26,12 @@ int main() {
     }
 
     sort(v.begin(), v.end(), [](const auto&a, const auto &b){
-        if(get<2>(a) != get<2>(b)) return get<1>(a) < get<1>(b);
-        if(get<2>(a)!= get<2>(b)) return get<2>(a) < get<2>(b);
+        if(get<2>(a) != get<2>(b)) return get<2>(a) < get<2>(b);
+        if(get<1>(a)!= get<1>(b)) return get<1>(a) < get<1>(b);
     });
 
     if(get<2>(v[0]) > 1){
+        //cout << get<0>(v[0]);
         cout << "None";
         return 0;
     }
