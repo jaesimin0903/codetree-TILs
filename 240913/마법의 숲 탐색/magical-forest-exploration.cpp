@@ -16,7 +16,7 @@ bool oob(int y, int x) {
 }
 
 void print() {
-	for (int i = 0; i < R+3; i++) {
+	for (int i = 0; i < R + 3; i++) {
 		for (int j = 0; j < C; j++) {
 			cout << map[i][j];
 		}
@@ -32,17 +32,21 @@ void clearMap(int y, int x) {
 	}
 }
 
-bool canMove(int sy, int sx, int y, int x,int num) {
-	//cout << "canMove\n";
+bool canMove(int sy, int sx, int y, int x, int num) {
+	cout << "run canMove\n";
 	bool canMove = true;
 
 	int tmp[3][3];
-
+	fill(&tmp[0][0], &tmp[0][0] + 3 * 3, 0);
+	//print();
+	tmp[1][1] = map[sy][sx];
 	for (int d = 0; d < 4; d++) {
-		int ny = y + dy[d];
-		int nx = x + dx[d];
+		int ny = sy + dy[d];
+		int nx = sx + dx[d];
 		tmp[1 + dy[d]][1 + dx[d]] = map[ny][nx];
 	}
+
+
 	//초기위치 초기화
 	clearMap(sy, sx);
 
@@ -52,23 +56,35 @@ bool canMove(int sy, int sx, int y, int x,int num) {
 		int ny = y + dy[d];
 		int nx = x + dx[d];
 		//cout << ny << " " << nx << "\n";
-		if (map[ny][nx] != 0 || oob(ny,nx)) {
+		if (map[ny][nx] != 0 || oob(ny, nx)) {
 			cout << "cant move\n";
-			for (int dir = 0; dir < 4; dir++) {
-				int nny = y + dy[dir];
-				int nnx = x + dx[dir];
-				map[nny][nnx] = tmp[1 + dy[dir]][1 + dx[dir]];
+			map[sy][sx] = tmp[1][1];
+			for (int dd = 0; dd < 4; dd++) {
+				int nny = sy + dy[dd];
+				int nnx = sx + dx[dd];
+				map[nny][nnx] = tmp[1 + dy[dd]][1 + dx[dd]];
+				//cout << tmp[1 + dy[dd]][1 + dx[dd]] << " ";
 			}
 			return false;
 		}
 	}
+	map[sy][sx] = tmp[1][1];
+	for (int dd = 0; dd < 4; dd++) {
+		int nny = sy + dy[dd];
+		int nnx = sx + dx[dd];
+		map[nny][nnx] = tmp[1 + dy[dd]][1 + dx[dd]];
+		//cout << tmp[1 + dy[dd]][1 + dx[dd]] << " ";
+	}
 	return canMove;
 }
 
-void setMap(int sy, int sx, int ey, int ex, int num, int d) {
+void setMap(int sy, int sx, int ey, int ex, int num, int d, int lr) {
 	//cout << "setMap " << ey << ex << num<<"\n";
 	int direction = -1;
-	if(d!=-1)d = (d + 1) % 4;
+	if (d != -1) {
+		if (lr == 1) d = (d + 1) % 4;
+		else d = (d + 3) % 4;
+	}
 	else {
 		for (int dir = 0; dir < 4; dir++) {
 			int ny = sy + dy[dir];
@@ -76,11 +92,12 @@ void setMap(int sy, int sx, int ey, int ex, int num, int d) {
 			if (map[ny][nx] < 0) direction = dir;
 		}
 	}
-
+	cout << "before clear\n";
+	//print();
 	clearMap(sy, sx);
 
 	map[ey][ex] = num;
-	for(int dir = 0;dir<4;dir++){
+	for (int dir = 0; dir < 4; dir++) {
 		int ny = ey + dy[dir];
 		int nx = ex + dx[dir];
 		map[ny][nx] = num;
@@ -94,6 +111,7 @@ void setMap(int sy, int sx, int ey, int ex, int num, int d) {
 		map[ny][nx] = -1 * num;
 	}
 	else {
+
 		map[ey + dy[direction]][ex + dx[direction]] = -1 * num;
 	}
 	//print();
@@ -114,20 +132,23 @@ int canMoveRL(int y, int x, int num) {
 	int ry = y;
 	int rx = x + 1;
 
-	if (canMove(y,x,ry, rx,num) && canMove(y,x,ry + 1, rx,num)) {
-		setMap(y, x, ry + 1, rx, num, (d+1)%4);
+	if (canMove(y, x, ry, rx, num) && canMove(y, x, ry + 1, rx, num)) {
+		setMap(y, x, ry + 1, rx, num, d, 1);
+		cout << "move right\n";
 		return 1;
 	}
+	setMap(y, x, y, x, num, -1, -1);
 
 	int ly = y;
 	int lx = x - 1;
 
-	if (canMove(y,x,ly, lx, num) && canMove(y,x,ly + 1, lx,num)) {
-		setMap(y, x, ly + 1, lx, num, (d + 1) % 4);
+	if (canMove(y, x, ly, lx, num) && canMove(y, x, ly + 1, lx, num)) {
+		setMap(y, x, ly + 1, lx, num, d,2);
+		cout << "move left\n";
 		return 2;
 	}
 
-	setMap(y, x, y, x, num, -1);
+	setMap(y, x, y, x, num, -1,-1);
 	return 0;
 }
 
@@ -135,12 +156,12 @@ bool canMoveDown(int y, int x, int num) {
 	int dy = y + 1;
 	int dx = x;
 
-	if (canMove(y,x,dy, dx, num)) {
-		setMap(y, x, dy, dx, num, -1);
+	if (canMove(y, x, dy, dx, num)) {
+		setMap(y, x, dy, dx, num, -1,-1);
 		return true;
 	}
 	else {
-		setMap(y, x, y, x, num, -1);
+		setMap(y, x, y, x, num, -1,-1);
 	}
 	return false;
 }
@@ -161,7 +182,8 @@ int bfs(int y, int x) {
 	bool v[80][80];
 	fill(&v[0][0], &v[0][0] + 80 * 80, false);
 	v[y][x] = true;
-	
+
+	//print();
 	while (!q.empty()) {
 		int yy = q.front().first;
 		int xx = q.front().second;
@@ -175,27 +197,24 @@ int bfs(int y, int x) {
 				if (map[ny][nx] > 0) {
 					if (map[ny][nx] != map[yy][xx])continue;
 				}
-				if (map[ny][nx] < 0) {
+				else if (map[ny][nx] < 0) {
 					if (map[ny][nx] != -1 * map[yy][xx])continue;
 				}
+				cout << yy << " " << xx << " " << map[ny][nx] << "-\n";
 				q.push({ ny,nx });
 				v[ny][nx] = true;
 				maxDepth = max(maxDepth, ny);
 			}
-			else if(map[yy][xx] < 0){
+			else if (map[yy][xx] < 0) {
+				cout << yy << " " << xx << " " <<map[yy][xx] << " " << map[ny][nx] << "-\n";
 				q.push({ ny,nx });
 				v[ny][nx] = true;
 				maxDepth = max(maxDepth, ny);
 			}
 		}
 	}
-	for (int i = 0; i < R + 3; i++) {
-		for (int j = 0; j < C; j++) {
-			cout << v[i][j] ? 1 : 0;
-		}
-		cout << "\n";
-	}
-	return maxDepth;
+	cout <<"값 : " << maxDepth-2;
+	return maxDepth-2;
 }
 
 
@@ -204,7 +223,7 @@ int main() {
 
 	cin >> R >> C >> K;
 	int ans = 0;
-	for (int i = 0; i < K; i++ ) {
+	for (int i = 0; i < K; i++) {
 		int sRow, dir;
 		cin >> sRow >> dir;
 		//인덱스 0 으로 맞추기위한 빼기
@@ -213,14 +232,16 @@ int main() {
 
 		int curY = 0;
 		int curX = sRow;
-		while (canMoveDown(curY, curX,i+1)) {
+		while (canMoveDown(curY, curX, i + 1)) {
 			//print();
 			//cout << "\n";
 			curY += 1;
 		}
 
+
 		while (true) {
 			int res = canMoveRL(curY, curX, i + 1);
+			print();
 			if (res == 1) {
 				curY += 1; curX += 1;
 			}
@@ -230,9 +251,9 @@ int main() {
 			else {
 				break;
 			}
+
 		}
 
-		print();
 
 		if (isFull()) {
 
@@ -241,7 +262,7 @@ int main() {
 		}
 		else {
 			//bfs 점수 계산
-			ans+=bfs(curY, curX);
+			ans += bfs(curY, curX);
 		}
 	}
 	cout << ans;
