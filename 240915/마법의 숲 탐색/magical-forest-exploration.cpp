@@ -130,15 +130,14 @@ bool canMoveRL(Golem &golem) {
 	int y = golem.y;
 	int x = golem.x;
 
-	while (canMoveDown(golem)) {
-
-	}
 
 	int ly = y;
 	int lx = x - 1;
+	while (canMoveDown(golem)) {}
 
 	if (canMove(golem, ly, lx) && canMove(golem, ly + 1, lx)) {
 		setMap(golem, 2);
+		while (canMoveDown(golem)) {}
 		//cout << "move left\n";
 		return true;
 	}
@@ -151,6 +150,7 @@ bool canMoveRL(Golem &golem) {
 
 	if (canMove(golem, ry, rx) && canMove(golem, ry + 1, rx)) {
 		setMap(golem, 1);
+		while (canMoveDown(golem)) {}
 		//cout << "move right\n";
 		return true;
 	}
@@ -239,8 +239,8 @@ int main() {
 
 		while(canMoveRL(golem)){ }
 
-		//print();
-		//cout << "\n";
+		/*print();
+		cout << "\n";*/
 
 
 		if (isFull()) {
