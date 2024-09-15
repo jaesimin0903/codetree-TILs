@@ -179,7 +179,7 @@ int canMoveRL(int y, int x, int num) {
 
 bool isFull() {
 	for (int i = 0; i < C; i++) {
-		if (map[2][i] >= 1) {
+		if (map[2][i] != 0) {
 			return true;
 		}
 	}
@@ -244,8 +244,7 @@ int main() {
 		int curY = 1;
 		int curX = sRow;
 		while (canMoveDown(curY, curX, i + 1,dir)) {
-			//print();
-			//cout << "\n";
+
 			curY += 1;
 		}
 
@@ -263,6 +262,9 @@ int main() {
 			}
 
 		}
+
+
+
 
 		if (isFull()) {
 
