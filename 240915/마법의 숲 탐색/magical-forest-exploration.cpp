@@ -8,6 +8,12 @@ using namespace std;
 int R, C, K;
 int map[80][80];
 
+struct Golem {
+	int y, x;
+	int num;
+	int dir;
+};
+
 int dy[4] = { -1,0,1,0 };
 int dx[4] = { 0,1,0,-1 };
 
@@ -18,7 +24,7 @@ bool oob(int y, int x) {
 void print() {
 	for (int i = 0; i < R + 3; i++) {
 		for (int j = 0; j < C; j++) {
-			cout << map[i][j] << "\t";
+			cout << map[i][j] << "  ";
 		}
 		cout << "\n";
 	}
@@ -32,23 +38,12 @@ void clearMap(int y, int x) {
 	}
 }
 
-bool canMove(int sy, int sx, int ey, int ex, int num) {
+bool canMove(Golem &golem, int ey, int ex) {
 	//cout << "run canMove\n";
 	bool canMove = true;
 
-	int tmp[3][3];
-	fill(&tmp[0][0], &tmp[0][0] + 3 * 3, 0);
-
-	tmp[1][1] = map[sy][sx];
-	for (int d = 0; d < 4; d++) {
-		int ny = sy + dy[d];
-		int nx = sx + dx[d];
-		tmp[1 + dy[d]][1 + dx[d]] = map[ny][nx];
-	}
-
-
 	//초기위치 초기화
-	clearMap(sy, sx);
+	clearMap(golem.y, golem.x);
 
 	//print();
 	//다음 움직일 곳으로 갈수 있는지?
@@ -57,123 +52,110 @@ bool canMove(int sy, int sx, int ey, int ex, int num) {
 		int nx = ex + dx[d];
 		//cout << ny << " " << nx << "\n";
 		if (map[ny][nx] != 0 || oob(ny, nx)) {
-			//cout << "cant move\n";
-			map[sy][sx] = tmp[1][1];
+			int sy = golem.y; int sx = golem.x;
+			map[sy][sx] = golem.num;
 			for (int dd = 0; dd < 4; dd++) {
 				int nny = sy + dy[dd];
 				int nnx = sx + dx[dd];
-				map[nny][nnx] = tmp[1 + dy[dd]][1 + dx[dd]];
-				//cout << tmp[1 + dy[dd]][1 + dx[dd]] << " ";
+				map[nny][nnx] = golem.num;
 			}
+			map[sy + dy[golem.dir]][sx + dx[golem.dir]] = golem.num * -1;
 			return false;
 		}
 	}
-	map[sy][sx] = tmp[1][1];
+
+	// 움직일 수 있따면
+	int sy = golem.y; int sx = golem.x;
+	map[sy][sx] = golem.num;
 	for (int dd = 0; dd < 4; dd++) {
 		int nny = sy + dy[dd];
 		int nnx = sx + dx[dd];
-		map[nny][nnx] = tmp[1 + dy[dd]][1 + dx[dd]];
-		//cout << tmp[1 + dy[dd]][1 + dx[dd]] << " ";
+		map[nny][nnx] = golem.num;
 	}
+	map[sy + dy[golem.dir]][sx + dx[golem.dir]] = golem.num * -1;
 	return true;
 }
 
-void setMap(int sy, int sx, int ey, int ex, int num, int d, int lr) {
+void setMap(Golem & golem,int lr) {
 	//cout << "setMap " << ey << ex << num<<"\n";
-	int direction = -1;
-	if (d != -1) {
-		if (lr == 1) d = (d + 1) % 4;
-		else if(lr==2) d = (d + 3) % 4;
+	clearMap(golem.y, golem.x);
+	
+	if (lr == 1) {//right
+		golem.dir = (golem.dir + 1) % 4;
+		golem.x += 1;
+		golem.y += 1;
 	}
-	else {
-		for (int dir = 0; dir < 4; dir++) {
-			int ny = sy + dy[dir];
-			int nx = sx + dx[dir];
-			if (map[ny][nx] < 0) direction = dir;
-		}
+	else if (lr == 2) { golem.dir = (golem.dir + 3) % 4; 
+	golem.x -= 1;
+	golem.y += 1;
 	}
-	//cout << "before clear\n";
-	//print();
-	clearMap(sy, sx);
+	else if(lr == 0) {
+		golem.y += 1;
+	}
+	else if (lr == -1) {
 
-	map[ey][ex] = num;
+	}
+
+
+	int ey = golem.y;
+	int ex = golem.x;
+
+	//움직이고자 하는 위치에 맵 저장
+	map[ey][ex] = golem.num;
 	for (int dir = 0; dir < 4; dir++) {
 		int ny = ey + dy[dir];
 		int nx = ex + dx[dir];
-		map[ny][nx] = num;
+		map[ny][nx] = golem.num;
 	}
-
-
-	//입구 설정
-	if (d != -1) {
-		int ny = ey + dy[d];
-		int nx = ex + dx[d];
-		map[ny][nx] = -1 * num;
-	}
-	else {
-		//cout << ey << " " << ex << "\n";
-		map[ey + dy[direction]][ex + dx[direction]] = -1 * num;
-	}
-	//print();
+	map[ey + dy[golem.dir]][ex + dx[golem.dir]] = golem.num * -1;
 
 }
-bool canMoveDown(int y, int x, int num,int dir) {
-	int dy = y + 1;
-	int dx = x;
-	if (dir == -1) return false;
-	if (canMove(y, x, dy, dx, num)) {
-		setMap(y, x, dy, dx, num, dir, -1);
+bool canMoveDown(Golem &golem) {
+	int dy = golem.y + 1;
+	int dx = golem.x;
+
+	if (canMove(golem,  dy, dx)) {
+		setMap(golem, 0);
 		return true;
 	}
-	else {
-		setMap(y, x, y, x, num, dir, -1);
-	}
+
 	return false;
 }
 
-int canMoveRL(int y, int x, int num) {
+bool canMoveRL(Golem &golem) {
 
 
 	//현재 위치에서 오른쪽 왼쪽 갈수있는지
-	int d = -1;
-	//cout << y << " " << x << " ";
-	for (int dir = 0; dir < 4; dir++) {
-		int ny = y + dy[dir];
-		int nx = x + dx[dir];
-		//cout << map[ny][nx] << " ";
-		if (oob(ny, nx)) continue;
-		if (map[ny][nx] <0 )
-			d = dir;
-	}
+	
+	int y = golem.y;
+	int x = golem.x;
 
-	while (canMoveDown(y, x, num, d)) {
-		y += 1;
-	}
-	//y -= 1;
+	while (canMoveDown(golem)) {
 
+	}
 
 	int ly = y;
 	int lx = x - 1;
 
-	if (canMove(y, x, ly, lx, num) && canMove(y, x, ly + 1, lx, num)) {
-		setMap(y, x, ly + 1, lx, num, d, 2);
+	if (canMove(golem, ly, lx) && canMove(golem, ly + 1, lx)) {
+		setMap(golem, 2);
 		//cout << "move left\n";
-		return 2;
+		return true;
 	}
 
-	setMap(y, x, y, x, num, -1, -1);
+	setMap(golem,-1);
 
 	//move right
 	int ry = y;
 	int rx = x + 1;
 
-	if (canMove(y, x, ry, rx, num) && canMove(y, x, ry + 1, rx, num)) {
-		setMap(y, x, ry + 1, rx, num, d, 1);
+	if (canMove(golem, ry, rx) && canMove(golem, ry + 1, rx)) {
+		setMap(golem, 1);
 		//cout << "move right\n";
-		return 1;
+		return true;
 	}
-	setMap(y, x, y, x, num, -1, -1);
-	return 0;
+	setMap(golem,-1);
+	return false;
 }
 
 
@@ -186,13 +168,13 @@ bool isFull() {
 	return false;
 }
 
-int bfs(int y, int x) {
+int bfs(Golem &golem) {
 	queue<pair<int, int>> q;
 	int maxDepth = 0;
-	q.push({ y,x });
+	q.push({ golem.y, golem.x });
 	bool v[80][80];
 	fill(&v[0][0], &v[0][0] + 80 * 80, false);
-	v[y][x] = true;
+	v[golem.y][golem.x] = true;
 
 	//print();
 	while (!q.empty()) {
@@ -243,27 +225,22 @@ int main() {
 
 		int curY = 1;
 		int curX = sRow;
-		while (canMoveDown(curY, curX, i + 1,dir)) {
 
-			curY += 1;
+		Golem golem;
+		golem.num = i + 1;
+		golem.y = curY;
+		golem.x = curX;
+		golem.dir = dir;
+
+		while (canMoveDown(golem)) {
+			
 		}
 
 
-		while (true) {
-			int res = canMoveRL(curY, curX, i + 1);
-			if (res == 1) {
-				curY += 1; curX += 1;
-			}
-			else if (res == 2) {
-				curY += 1; curX -= 1;
-			}
-			else {
-				break;
-			}
+		while(canMoveRL(golem)){ }
 
-		}
-
-
+		//print();
+		//cout << "\n";
 
 
 		if (isFull()) {
@@ -273,7 +250,7 @@ int main() {
 		}
 		else {
 			//bfs 점수 계산
-			ans += bfs(curY, curX);
+			ans += bfs(golem);
 		}
 	}
 	cout << ans;
