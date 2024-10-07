@@ -170,7 +170,7 @@ pair<pair<int, int>, int> findRotateCell() {
     pair<pair<int, int>, int> result = { {-1,-1}, -1 };
     int maxPart = 0;
     for (int j = 4; j >= 0;j--) {
-        for (int i = 4; i >= 0;i++) {
+        for (int i = 4; i >= 0;i--) {
             for (int r = 0; r < 3; r++) {
                 rotate(make_pair(i, j), r);
                 int part = bfs(false);
