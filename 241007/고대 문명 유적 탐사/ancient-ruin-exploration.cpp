@@ -51,6 +51,7 @@ int bfs(bool isChain) {
 
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
+                if (v[i][j]) continue;
                 int cur = board[i][j];
                 int curCnt = 1;
                 queue<pair<int, int>>q;
@@ -97,6 +98,7 @@ int bfs(bool isChain) {
     if (!isChain) {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
+                if (v[i][j]) continue;
                 int cur = board[i][j];
                 int curCnt = 1;
                 queue<pair<int, int>>q;
@@ -141,7 +143,7 @@ void rotate(pair<int, int> p, int deg) {
     int tx = p.second;
 
     
-    int rotations = deg +1;  
+    int rotations = deg;  
     for(int i =0;i<deg+1;i++){
         // 90도 회전하는 부분
         // 3x3 구역 추출 후 회전
