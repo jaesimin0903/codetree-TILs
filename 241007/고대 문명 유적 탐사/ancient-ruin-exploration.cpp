@@ -185,12 +185,22 @@ pair<pair<int, int>, int> findRotateCell() {
                         result.second = r;
                     }
                     else if (result.second == r) {
-                        if (result.first.first > i) {
+                        /*if (result.first.first > i) {
                             result.first = { i,j };
                             result.second = r;
                         }
                         else if (result.first.first == i) {
                             if (result.first.second > j) {
+                                result.first = { i,j };
+                                result.second = r;
+                            }
+                        }*/
+                        if (result.first.second > j) {
+                            result.first = { i,j };
+                            result.second = r;
+                        }
+                        else if (result.first.second == j) {
+                            if (result.first.first > i) {
                                 result.first = { i,j };
                                 result.second = r;
                             }
@@ -203,6 +213,7 @@ pair<pair<int, int>, int> findRotateCell() {
     }
     //cout << result.first.first << " " << result.first.second << " " << result.second << "\n";
     //printBoard();
+    //cout << "\n";
     return result;
 }
 
