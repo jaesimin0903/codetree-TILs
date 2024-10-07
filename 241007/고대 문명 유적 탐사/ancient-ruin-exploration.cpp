@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <cstring>
+
 using namespace std;
 
 int K, M;
@@ -41,11 +42,13 @@ int bfs(bool isChain) {
     int answer = 0;
     int chainAnswer = 0;
     bool v[5][5];
-    memset(v, false, 25);
+    memset(v, false, sizeof(v));
+
     while (isChain) {
         //printBoard();
         bool isPassing = true;
-        memset(v, false, 25);
+        memset(v, false, sizeof(v));
+
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 int cur = board[i][j];
