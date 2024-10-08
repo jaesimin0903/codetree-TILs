@@ -140,9 +140,6 @@ void move() {
         }
     }
 
-
-
-
     while (!q.empty()) {
         int curY, curX;
         curY = q.front().first; curX = q.front().second;
@@ -186,14 +183,19 @@ void move() {
                 tmp[moveY][moveX] += maze[curY][curX];
             }
             maze[curY][curX] =0;
+        }
+    }
 
-            for (int i = 1; i <= N; i++) {
-                for (int j = 1; j <= N; j++) {
-                    if(tmp[i][j] != 0)maze[i][j] = tmp[i][j];
-                }
+    // 모든 이동 후, tmp 배열을 maze로 복사
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= N; j++) {
+            if (tmp[i][j] != 0) {
+                maze[i][j] += tmp[i][j];  // tmp 배열의 값들을 maze로 복사
             }
         }
     }
+
+   // cout << totalDis << "\n";
 }
 
 bool isAllEmpty() {
