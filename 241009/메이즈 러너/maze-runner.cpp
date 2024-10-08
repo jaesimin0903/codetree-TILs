@@ -101,8 +101,8 @@ tuple<int, int, int> findSmallSqure() {
     int pointX = 0;
 
     for (int size = 2; size <= N; size++) {
-        for (int i = 1; i <= N - size; i++) {
-            for (int j = 1; j <= N - size; j++) {
+        for (int i = 1; i <= N - size +1; i++) {
+            for (int j = 1; j <= N - size+1; j++) {
                 int peopleCount = 0;
                 bool hasExit = false;
                 for (int row = i; row < i + size; row++) {
@@ -111,7 +111,7 @@ tuple<int, int, int> findSmallSqure() {
                         else if (-10 <= maze[row][col] && maze[row][col] <= -1) peopleCount += -1 * maze[row][col];
                     }
                 }
-
+                //cout << i << " " << j << " " << size << "---loop\n";
                 if (hasExit && peopleCount >=1) {
                     pointWithSize = { i,j,size };
                     //cout << i << " " << j << " " << size << "\n";
@@ -177,7 +177,7 @@ void move() {
         //움직일 곳을 찾았다면
         if (moveY != 0) {
             totalDis += maze[curY][curX] * -1;
-            maze[curY][curX] +=1;
+            maze[curY][curX] =0;
             if (maze[moveY][moveX] != -11) {
                 maze[moveY][moveX] -= 1;
             }
@@ -219,13 +219,14 @@ int main() {
         }
 
         move();
-        //printMaze();
-        //cout << "\n";
+    /*    cout << "----\n";
+        printMaze();
+        cout << "\n";*/
         tuple<int, int, int> pointWithSize = findSmallSqure();
 
         rotate(pointWithSize);
         //printMaze();
-        //cout << "\n";
+        //cout << "----\n";
     }
 
     cout << totalDis << "\n";
