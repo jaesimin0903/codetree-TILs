@@ -126,9 +126,11 @@ tuple<int, int, int> findSmallSqure() {
 
 void move() {
     int eY, eX;
+    int tmp[21][21];
     queue<pair<int, int>> q;
     for (int i = 1; i <= N; i++) {
         for (int j = 1; j <= N; j++) {
+            tmp[i][j] = 0;
             if (maze[i][j] == -11) {
                 eY = i; eX = j;
             }
@@ -137,6 +139,9 @@ void move() {
             }
         }
     }
+
+
+
 
     while (!q.empty()) {
         int curY, curX;
@@ -178,9 +183,15 @@ void move() {
         if (moveY != 0) {
             totalDis += maze[curY][curX] * -1;
             if (maze[moveY][moveX] != -11) {
-                maze[moveY][moveX] += maze[curY][curX];
+                tmp[moveY][moveX] += maze[curY][curX];
             }
             maze[curY][curX] =0;
+
+            for (int i = 1; i <= N; i++) {
+                for (int j = 1; j <= N; j++) {
+                    if(tmp[i][j] != 0)maze[i][j] = tmp[i][j];
+                }
+            }
         }
     }
 }
@@ -219,9 +230,9 @@ int main() {
         }
 
         move();
-    /*    cout << "----\n";
-        printMaze();
-        cout << "\n";*/
+        //cout << "----\n";
+        //printMaze();
+        //cout << "\n";
         tuple<int, int, int> pointWithSize = findSmallSqure();
 
         rotate(pointWithSize);
