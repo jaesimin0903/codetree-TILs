@@ -177,10 +177,10 @@ void move() {
         //움직일 곳을 찾았다면
         if (moveY != 0) {
             totalDis += maze[curY][curX] * -1;
-            maze[curY][curX] =0;
             if (maze[moveY][moveX] != -11) {
-                maze[moveY][moveX] -= 1;
+                maze[moveY][moveX] += maze[curY][curX];
             }
+            maze[curY][curX] =0;
         }
     }
 }
