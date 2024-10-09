@@ -241,7 +241,7 @@ void rMove(int turn) {
     for (int d = 0; d < 8; d++) {
         int ny = ry + dy[d];
         int nx = rx + dx[d];
-        int nGap = abs(selectSantaY - ny) + abs(selectSantaX - nx);
+        int nGap = pow(selectSantaY - ny,2) + pow(selectSantaX - nx,2);
         if (oob(ny, nx))continue;
         if (dirDis > nGap) {
             dir = d;
