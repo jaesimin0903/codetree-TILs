@@ -69,7 +69,8 @@ void santaSantaChain(int y, int x, int dir) {
     int curSantaNum = map[y][x];
     int ny = y + dy[dir];
     int nx = x + dx[dir];
-
+    map[y][x] = 0;
+    //cout << "chain " << curSantaNum << " dir : " << dir << "\n";
     if (oob(ny, nx)) {
         //cout << "oob\n";
         santa[curSantaNum].isOut = true;
@@ -127,9 +128,21 @@ void sMove(int turn) {
     for (int i = 1; i <= P; i++) {
         //기절한 상태면 패스
         if (santa[i].stunTime + 1 >= turn)continue;
-        //cout << "stuntime number : " << i << " " << santa[i].stunTime << " " << turn << "\n";
+
         int curY = s[i].first;
         int curX = s[i].second;
+
+        for (int a = 1; a<= N; a++) {
+            for (int b = 1; b <= N; b++) {
+                if (map[a][b] == i) {
+                    curY = a;
+                    curX = b;
+                }
+            }
+        }
+
+        //cout << "stuntime number : " << i << " " << santa[i].stunTime << " " << turn << "\n";
+
         int gap = pow(curY - ry,2) + pow(curX - rx,2);
 
         int moveY = 0;
@@ -169,6 +182,7 @@ void sMove(int turn) {
                 santa[i].stunTime = turn;
                 dir = (dir + 2) % 4;
                 //cout <<moveX << " " << moveY << " "<< dir << "\n";
+                //날아가는 곳이 장외라면
                 if (oob(moveY + dy[dir] * D, moveX + dx[dir] * D)) {
                     santa[i].isOut = true;
                 }//벗어난다면
@@ -186,6 +200,7 @@ void sMove(int turn) {
         else {
             //cout <<i << " "<< "santa doesnt move\n";
         }
+
     }
 
     for (int i = 1; i <= P; i++) {
@@ -306,16 +321,16 @@ int main() {
         }
 
         rMove(turn);
-        // cout << "rMove\n";
-        // printMap();
+         //cout << "rMove\n";
+         //printMap();
         sMove(turn);
-        /*cout << "sMove\n";
-        printMap();*/
+        //cout << "sMove\n";
+        //printMap();
 
-        /*for (int i = 1; i <= P; i++) {
-            cout << santa[i].point << " ";
-        }
-        cout << '\n';*/
+        //for (int i = 1; i <= P; i++) {
+        //    cout << santa[i].point << " ";
+        //}
+        //cout << '\n';
     }
 
     for (int i = 1; i <= P; i++) {
