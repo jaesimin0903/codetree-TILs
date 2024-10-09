@@ -74,11 +74,11 @@ void santaSantaChain(int y, int x, int dir) {
         //cout << "oob\n";
         santa[curSantaNum].isOut = true;
     }
-    else if (map[ny][nx] >= 0) {
+    else if (map[ny][nx] >= 1) {
 
         santaSantaChain(ny, nx, dir);
         map[ny][nx] = curSantaNum;
-    }
+    }else map[ny][nx] = curSantaNum;
 }
 
 void santaChain(int y, int x, int dir, int turn) {
