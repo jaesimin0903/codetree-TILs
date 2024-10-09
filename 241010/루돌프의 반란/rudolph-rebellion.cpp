@@ -129,8 +129,8 @@ void sMove(int turn) {
         //기절한 상태면 패스
         if (santa[i].stunTime + 1 >= turn)continue;
 
-        int curY = s[i].first;
-        int curX = s[i].second;
+        int curY = 0;
+            int curX = 0;
 
         for (int a = 1; a<= N; a++) {
             for (int b = 1; b <= N; b++) {
@@ -140,6 +140,8 @@ void sMove(int turn) {
                 }
             }
         }
+
+        if (curY == 0) continue;
 
         //cout << "stuntime number : " << i << " " << santa[i].stunTime << " " << turn << "\n";
 
@@ -200,7 +202,7 @@ void sMove(int turn) {
         else {
             //cout <<i << " "<< "santa doesnt move\n";
         }
-
+        //printMap(); cout << "\n";
     }
 
     for (int i = 1; i <= P; i++) {
