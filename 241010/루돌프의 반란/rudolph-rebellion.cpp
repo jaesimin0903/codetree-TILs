@@ -36,7 +36,7 @@ using namespace std;
 //매턴 이후 탈락하지 않은 산타들에게1 점 추가 부여
 //각산타가 얻은 최종 점수를 구하자
 
-struct Santa{
+struct Santa {
     int stunTime;
     int point;
     bool isOut;
@@ -46,9 +46,9 @@ int map[51][51];
 Santa santa[31];
 int N, M, P, C, D;
 
-void printMap(){
-    for(int i = 1;i<=N;i++){
-        for(int j = 1;j<=N;j++){
+void printMap() {
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= N; j++) {
             cout << setw(3) << map[i][j];
         }
         cout << "\n";
@@ -56,66 +56,67 @@ void printMap(){
     cout << "\n";
 }
 
-bool oob(int y, int x){
+bool oob(int y, int x) {
     return y<1 || x < 1 || y>N || x>N;
 }
 
-void santaSantaChain(int y, int x, int dir){
-    int dy[8] = {-1,-1,0,1,1,1,0,-1};
-    int dx[8] = {0,1,1,1,0,-1,-1,-1};
+void santaSantaChain(int y, int x, int dir) {
+    int dy[8] = { -1,-1,0,1,1,1,0,-1 };
+    int dx[8] = { 0,1,1,1,0,-1,-1,-1 };
 
-    if(map[y][x] ==0) return;
+    if (map[y][x] == 0) return;
     //cout << map[y][x] << "\n";
     int curSantaNum = map[y][x];
     int ny = y + dy[dir];
     int nx = x + dx[dir];
 
-    if(oob(ny,nx)){
+    if (oob(ny, nx)) {
         //cout << "oob\n";
         santa[curSantaNum].isOut = true;
-    }else if(map[ny][nx] >= 0){
-        
-        santaSantaChain(ny,nx,dir);
+    }
+    else if (map[ny][nx] >= 0) {
+
+        santaSantaChain(ny, nx, dir);
         map[ny][nx] = curSantaNum;
     }
 }
 
-void santaChain(int y, int x, int dir, int turn){
-    int dy[8] = {-1,-1,0,1,1,1,0,-1};
-    int dx[8] = {0,1,1,1,0,-1,-1,-1};
+void santaChain(int y, int x, int dir, int turn) {
+    int dy[8] = { -1,-1,0,1,1,1,0,-1 };
+    int dx[8] = { 0,1,1,1,0,-1,-1,-1 };
 
     int curSantaNum = map[y][x];
     santa[curSantaNum].stunTime = turn;
     santa[curSantaNum].point += C;
 
     map[y][x] = 0;
-    if(oob(y+dy[dir] * C, x + dx[dir] * C)) santa[curSantaNum].isOut = true;
-    else if(map[y+dy[dir] * C][x + dx[dir] * C] >= 1){
-        santaSantaChain(y+dy[dir] * C,x + dx[dir] * C,dir);
-        map[y+dy[dir] * C][x + dx[dir] * C] = curSantaNum;
+    if (oob(y + dy[dir] * C, x + dx[dir] * C)) santa[curSantaNum].isOut = true;
+    else if (map[y + dy[dir] * C][x + dx[dir] * C] >= 1) {
+        santaSantaChain(y + dy[dir] * C, x + dx[dir] * C, dir);
+        map[y + dy[dir] * C][x + dx[dir] * C] = curSantaNum;
     }
     else map[y + dy[dir] * C][x + dx[dir] * C] = curSantaNum;
-    
+
 }
 
-void sMove(int turn){
-    pair<int,int> s[31];
-    int dy[4] = {-1,0,1,0};
-    int dx[4] = {0,1,0,-1};
+void sMove(int turn) {
+    pair<int, int> s[31];
+    int dy[4] = { -1,0,1,0 };
+    int dx[4] = { 0,1,0,-1 };
 
     int ry, rx;
     //find r's point
-    for(int i = 1;i<=N;i++){
-        for(int j =1;j<=N;j++){
-            if(map[i][j] == -1){
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= N; j++) {
+            if (map[i][j] == -1) {
                 ry = i; rx = j;
             }
         }
     }
 
-    for(int i = 1;i<=N;i++){
-        for(int j = 1;j<=N;j++){
-            if(map[i][j] >= 1){
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= N; j++) {
+            if (map[i][j] >= 1) {
                 s[map[i][j]].first = i;
                 s[map[i][j]].second = j;
             }
@@ -123,75 +124,77 @@ void sMove(int turn){
     }
 
     //산타 1번부터 움직임
-    for(int i= 1;i<=P;i++){
+    for (int i = 1; i <= P; i++) {
         //기절한 상태면 패스
-        if(santa[i].stunTime + 1 >= turn)continue;
+        if (santa[i].stunTime + 1 >= turn)continue;
         //cout << "stuntime number : " << i << " " << santa[i].stunTime << " " << turn << "\n";
         int curY = s[i].first;
         int curX = s[i].second;
-        int gap = abs(curY - ry) +abs(curX - rx);
+        int gap = pow(curY - ry,2) + pow(curX - rx,2);
 
         int moveY = 0;
         int moveX = 0;
         int dir = -1;
 
-        for(int d = 0;d<4;d++){
+        for (int d = 0; d < 4; d++) {
             int ny = curY + dy[d];
             int nx = curX + dx[d];
-            if(oob(ny,nx))continue;
-            if(map[ny][nx] >= 1) continue;
-            int nGap = abs(ry - ny) + abs(rx - nx) + 1;
+            if (oob(ny, nx))continue;
+            if (map[ny][nx] >= 1) continue;
+            int nGap = pow(ry - ny,2) + pow(rx - nx,2);
             //cout << nGap << " " << gap << "\n";
-            if(gap == nGap){
+            if (gap > nGap) {
+                gap = nGap;
                 moveY = ny;
                 moveX = nx;
                 dir = d;
-                break;
             }
         }
         //santa move
-        if(moveY != 0){
+        if (moveY != 0) {
             map[curY][curX] = 0;
             //도착한 곳이 루돌프라면
-            if(map[moveY][moveX] == -1){
+            if (map[moveY][moveX] == -1) {
                 //점수증가
                 santa[i].point += D;
                 //연쇄반응 0 2 4 6
                 santa[i].stunTime = turn;
                 dir = (dir + 2) % 4;
                 //cout <<moveX << " " << moveY << " "<< dir << "\n";
-                if(oob(moveY+dy[dir]*D,moveX+dx[dir]*D)){
+                if (oob(moveY + dy[dir] * D, moveX + dx[dir] * D)) {
                     santa[i].isOut = true;
                 }//벗어난다면
-                else{
-                    int chainDir = dir *2;
-                    santaSantaChain(moveY+dy[dir]*D, moveX+dx[dir]*D,chainDir );
-                    map[moveY + dy[dir] * D][moveX + dx[dir]*D] = i;
+                else {
+                    int chainDir = dir * 2;
+                    santaSantaChain(moveY + dy[dir] * D, moveX + dx[dir] * D, chainDir);
+                    map[moveY + dy[dir] * D][moveX + dx[dir] * D] = i;
                 }
-            }else{
+            }
+            else {
                 map[moveY][moveX] = i;
             }
-            
-        }else{
+
+        }
+        else {
             //cout <<i << " "<< "santa doesnt move\n";
         }
     }
 
-    for(int i = 1;i<=P;i++){
-        if(!santa[i].isOut)santa[i].point++;
+    for (int i = 1; i <= P; i++) {
+        if (!santa[i].isOut)santa[i].point++;
     }
 }
 
 
 
-void rMove(int turn){
-    int dy[8] = {-1,-1,0,1,1,1,0,-1};
-    int dx[8] = {0,1,1,1,0,-1,-1,-1};
+void rMove(int turn) {
+    int dy[8] = { -1,-1,0,1,1,1,0,-1 };
+    int dx[8] = { 0,1,1,1,0,-1,-1,-1 };
     int ry, rx;
     //find r's point
-    for(int i = 1;i<=N;i++){
-        for(int j =1;j<=N;j++){
-            if(map[i][j] == -1){
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= N; j++) {
+            if (map[i][j] == -1) {
                 ry = i; rx = j;
             }
         }
@@ -201,24 +204,26 @@ void rMove(int turn){
     int selectSantaDis = 1e9;
     int selectSantaY = -1;
     int selectSantaX = -1;
-    for(int i = 1;i<=N;i++){
-        for(int j= 1;j<=N;j++){
-            if(map[i][j] >= 1){
-                int dis = pow((ry-i),2) + pow((rx-j),2);
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= N; j++) {
+            if (map[i][j] >= 1) {
+                int dis = pow((ry - i), 2) + pow((rx - j), 2);
                 //선택된 산타거리보다 작다면 선택
-                if(selectSantaDis > dis){
+                if (selectSantaDis > dis) {
                     selectSantaDis = dis;
                     selectSantaNum = map[i][j];
                     selectSantaY = i;
                     selectSantaX = j;
-                }else if(selectSantaDis == dis){
-                    if(selectSantaY < i){//거리가같고 선택된 산타의 R 보다 크다면
-                       selectSantaDis = dis;
+                }
+                else if (selectSantaDis == dis) {
+                    if (selectSantaY < i) {//거리가같고 선택된 산타의 R 보다 크다면
+                        selectSantaDis = dis;
                         selectSantaNum = map[i][j];
                         selectSantaY = i;
-                        selectSantaX = j; 
-                    }else if(selectSantaY == i){
-                        if(selectSantaX < j){
+                        selectSantaX = j;
+                    }
+                    else if (selectSantaY == i) {
+                        if (selectSantaX < j) {
                             selectSantaDis = dis;
                             selectSantaNum = map[i][j];
                             selectSantaY = i;
@@ -233,12 +238,12 @@ void rMove(int turn){
     int dir = -1;
     int dirDis = 1e9;
     //루돌프가 선택된 산타까지 최단거리로 움직일 수 있는 위치 찾기
-    for(int d = 0;d<8;d++){
-        int ny  = ry + dy[d];
+    for (int d = 0; d < 8; d++) {
+        int ny = ry + dy[d];
         int nx = rx + dx[d];
         int nGap = abs(selectSantaY - ny) + abs(selectSantaX - nx);
-        if(oob(ny,nx))continue;
-        if(dirDis > nGap){
+        if (oob(ny, nx))continue;
+        if (dirDis > nGap) {
             dir = d;
             dirDis = nGap;
         }
@@ -249,20 +254,21 @@ void rMove(int turn){
     int rrx = rx + dx[dir];
     if (oob(rry, rrx)) return;
     //움직이려는 위치에 산타가있다면 연쇄반응
-    if(map[rry][rrx] >= 1){
+    if (map[rry][rrx] >= 1) {
         map[ry][rx] = 0;
-        santaChain(rry,rrx, dir, turn);
+        santaChain(rry, rrx, dir, turn);
         map[rry][rrx] = -1;
-    }else{
+    }
+    else {
         map[ry][rx] = 0;
         map[rry][rrx] = -1;
     }
 }
 
-bool thereIsNoSanta(){
-    for(int i =1;i<=N;i++){
-        for(int j =1;j<=N;j++){
-            if(map[i][j] >=1) return false;
+bool thereIsNoSanta() {
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= N; j++) {
+            if (map[i][j] >= 1) return false;
         }
     }
     return true;
@@ -274,7 +280,7 @@ int main() {
     int rY, rX;
     cin >> rY >> rX;
     map[rY][rX] = -1;
-    for(int i = 0;i<P;i++){
+    for (int i = 0; i < P; i++) {
         int sN, sY, sX;
         cin >> sN >> sY >> sX;
         Santa s;
@@ -284,26 +290,26 @@ int main() {
         santa[sN] = s;
         map[sY][sX] = sN;
     }
-    printMap();cout << "\n";
-    for(int turn = 1;turn<=M;turn++){
-        if(thereIsNoSanta()){
+    //printMap(); cout << "\n";
+    for (int turn = 1; turn <= M; turn++) {
+        if (thereIsNoSanta()) {
             break;
         }
-        
+
         rMove(turn);
         // cout << "rMove\n";
         // printMap();
         sMove(turn);
-        cout << "sMove\n";
-        printMap();
+        /*cout << "sMove\n";
+        printMap();*/
 
-        for(int i = 1;i<=P;i++){
+        /*for (int i = 1; i <= P; i++) {
             cout << santa[i].point << " ";
         }
-        cout << '\n';
+        cout << '\n';*/
     }
 
-    for(int i = 1;i<=P;i++){
+    for (int i = 1; i <= P; i++) {
         cout << santa[i].point << " ";
     }
     return 0;
