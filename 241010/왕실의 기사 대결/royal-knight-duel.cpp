@@ -1,6 +1,8 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
+#include <queue>
+#include <tuple>
 using namespace std;
 
 //LxL chess board
@@ -38,7 +40,7 @@ int dy[4] = { -1,0,1,0 };
 int dx[4] = { 0,1,0,-1 };
 
 bool oob(int y, int x) {
-	return y < 1 || x < 1 || y> N || x>N;
+	return y < 1 || x < 1 || y> L || x>L;
 }
 
 void resetBoard() {
@@ -60,31 +62,61 @@ void paintBoard() {
 }
 
 void attack(int knightNum) {
-	int shieldW = knights[knightNum].w;
-	int shieldH = knights[knightNum].h;
-	int kY = knights[knightNum].y;
-	int kX = knights[knightNum].x;
+	int cur = knightNum;
 	
-	int trapCount = 0;
-	for (int i = kY; i < kY + shieldW; i++) {
-		for (int j = kX; j < kX + shieldH; j++) {
-			if (trap[i][j] == 1) trapCount++;
-		}
-	}
+	for (int i = 1; i <= N; i++) {
+		if (cur == i) continue;
+		if (knights[i].k <= 0) continue;
+		int y = knights[i].y;
+		int x = knights[i].x;
+		int h = knights[i].h;
+		int w = knights[i].w;
 
-	for (int i = kY; i < kY + shieldW; i++) {
-		for (int j = kX; j < kX + shieldH; j++) {
-			if (board[i][j] >= 1 && board[i][j] != knightNum) {
-				knights[board[i][j]].k -= trapCount;
-				ans += trapCount;
-				if (knights[board[i][j]].k <= 0) board[i][j] = 0;
+		int trapCount = 0;
+		for (int row = y; row < y + h; row++) {
+			for (int col = x; col < x + w; col++) {
+				if (trap[row][col] == 1) {
+					trapCount++;
+				}
 			}
 		}
+
+		knights[i].k -= trapCount;
+		ans += trapCount;
 	}
 }
 
+bool isPointInTheShield(int pY, int pX, int pH, int pW, int nY, int nX, int nH, int nW) {
+	pair<int, int> points[4];
+	pair<int, int> npoints[4];
+
+	// 직사각형의 4개의 꼭짓점 정의
+	points[0] = { pY, pX };
+	points[1] = { pY, pX + pW - 1 };
+	points[2] = { pY + pH - 1, pX };
+	points[3] = { pY + pH - 1, pX + pW - 1 };
+
+	npoints[0] = { nY, nX };
+	npoints[1] = { nY, nX + nW - 1 };
+	npoints[2] = { nY + nH - 1, nX };
+	npoints[3] = { nY + nH - 1, nX + nW - 1 };
+
+	// npoints의 각 꼭짓점이 points로 정의된 직사각형 안에 있는지 확인
+	for (int i = 0; i < 4; i++) {
+		int nx = npoints[i].second; // npoints의 x좌표
+		int ny = npoints[i].first;  // npoints의 y좌표
+
+		// 직사각형 안에 있는지 확인
+		if (points[0].second <= nx && nx <= points[1].second && points[0].first <= ny && ny <= points[2].first) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
 void moveChain(int y, int x, int dir) {
-	vector<pair<pair<int,int>,int>> boardKnightArray;
+	vector<pair<pair<int, int>, int>> boardKnightArray;
 	int yy = y;
 	int xx = x;
 	//현재 위치 저장
@@ -95,14 +127,14 @@ void moveChain(int y, int x, int dir) {
 		boardKnightArray.push_back({ {y,x},board[y][x] });
 	}
 
-	pair<pair<int,int>,int> tmp1 = boardKnightArray[0];
+	pair<pair<int, int>, int> tmp1 = boardKnightArray[0];
 	boardKnightArray[0] = { {0,0},0 };
 	pair<pair<int, int>, int> tmp2;
-	for (int i = 1; i < boardKnightArray.size()-1; i++) {
+	for (int i = 1; i < boardKnightArray.size() - 1; i++) {
 		tmp2 = boardKnightArray[i];
 		boardKnightArray[i] = { {tmp1.first.first + dy[dir], tmp1.first.second + dx[dir]},tmp1.second };
 		if (tmp2.second == 0) break;
-		tmp1 = tmp2; 
+		tmp1 = tmp2;
 	}
 
 	//정보갱신
@@ -113,17 +145,64 @@ void moveChain(int y, int x, int dir) {
 }
 
 bool isMoveChain(int y, int x, int dir) {
-	//현재 y,x 는 움직이고나서의 위치
-	//y,x에 기사가 있다.
-	vector<int> boardKnightArray;
+	// 부딪히는 기사를 넣을 큐
+	queue<tuple<int,int,int>> targetKnight;
+	//연쇄작용 성공시 담을 벡터
+	vector<tuple<int, int, int>> moveKnight;
+	int curKnightNum = board[y][x];
+	targetKnight.push({ curKnightNum, knights[curKnightNum].y + dy[dir], knights[curKnightNum].x + dx[dir] });
+	moveKnight.push_back({ curKnightNum, knights[curKnightNum].y + dy[dir], knights[curKnightNum].x + dx[dir] });
+	while (!targetKnight.empty()) {
+		int cur, curY, curX;
+		tie(cur, curY, curX ) = targetKnight.front();
+		//cout << cur << " " << curY << " " << curX << "\n";
+		targetKnight.pop();
 
+		int curW = knights[cur].w;
+		int curH = knights[cur].h;
+		
+	//움직일 위치에 방패에 걸리는 애가 있는지?
 	
-
-	//벡터가 꽉차있다면 밀면 나가니까 밀수없음
-	bool isFull = true;
-	for (auto v : boardKnightArray) {
-		if (v == 0) return false;
+		for (int i = curY; i < curY + curH; i++) {
+			for (int j = curX; j < curX + curW; j++) {
+				//cout << "trap " << trap[i][j] << "\n";
+				if (oob(i, j)) {
+					//cout << "oob\n";
+					return false;
+				}
+				if (trap[i][j] == 2) {
+					//cout << "rock\n";
+					return false;
+				}
+			}
+		}
+				//전체 기사들을 순회하면서 
+		for (int n = 1; n <= N; n++) {
+			if (cur != n) {
+				int nY = knights[n].y;
+				int nX = knights[n].x;
+				int nH = knights[n].h;
+				int nW = knights[n].w;
+				//움직인 기사의 방패가 i 기사와 겹친다면
+				if (isPointInTheShield(curY, curX, curH, curW, nY, nX, nH, nW)) {
+					//cout << cur << " push " << n << "\n";
+					targetKnight.push({ n,nY + dy[dir], nX + dx[dir] });
+					moveKnight.push_back({ n,nY + dy[dir], nX + dx[dir] });
+				}
+			}
+		}
 	}
+	resetBoard();
+	//성공이라면 정보를 직접 이동
+	for (auto val : moveKnight) {
+		int num = get<0>(val);
+		int y = get<1>(val);
+		int x = get<2>(val);
+
+		knights[num].y = y;
+		knights[num].x = x;
+	}
+	paintBoard();
 	return true;
 }
 
@@ -137,9 +216,9 @@ bool move(int knightNum, int dir) {
 	int willMoveX = knights[knightNum].x + dx[dir];
 
 	bool isBoundary = false;
-	for (int i = willMoveY; i < willMoveY + curKnightW; i++) {
+	for (int i = willMoveY; i < willMoveY + curKnightH; i++) {
 		if (oob(willMoveY + curKnightH - 1, willMoveX + curKnightW - 1)) isBoundary = true;
-		for (int j = willMoveX; j < willMoveX + curKnightH; j++) {
+		for (int j = willMoveX; j < willMoveX + curKnightW; j++) {
 			if (board[i][j] != knightNum && board[i][j] >= 1 && trap[i][j] != 2) isBoundary = true;
 		}
 	}
@@ -147,27 +226,29 @@ bool move(int knightNum, int dir) {
 	//움직이려는 곳이 다른 기사가 있다면?
 	if (isBoundary) {
 		//연쇄 움직임이 가능한지?
-		if (isMoveChain(curMoveY, curMoveX,dir)) {
-			moveChain(curMoveY, curMoveX,dir);
-			//기사의 상태를 업데이트 해야하므로 리셋
-			resetBoard();
+		if (isMoveChain(curMoveY, curMoveX, dir)) {
+			//cout << "chain action\n";
+			return true;
 		}
 		else {
+			//cout << "chain fail\n";
 			return false;
 		}
 	}
 	else {
 		//움직이려는 곳이 비어있다면 보드, 정보 변경
+		//cout << "no chain\n";
+		resetBoard();
 		knights[knightNum].y = willMoveY;
 		knights[knightNum].x = willMoveX;
+		paintBoard();
+		return false;
 	}
-
-	//업데이트된 정보를 그리기
-	paintBoard();
+	
 }
 
 void print() {
-	for (int i = 1; i <= L;i++ ) {
+	for (int i = 1; i <= L; i++) {
 		for (int j = 1; j <= L; j++) {
 			cout << setw(4) << board[i][j];
 		}
@@ -187,7 +268,7 @@ int main() {
 
 	for (int i = 1; i <= N; i++) {
 		int r, c, h, w, k;
-		cin >> r >> c >> h >> w >> k;	
+		cin >> r >> c >> h >> w >> k;
 		knights[i].y = r;
 		knights[i].x = c;
 		knights[i].h = h;
@@ -197,14 +278,16 @@ int main() {
 		board[r][c] = i;
 	}
 
+
+	//print();
 	while (Q--) {
 		int knightNum, dir;
 		cin >> knightNum >> dir;
 
 		//움직여라
 		bool isAttack = move(knightNum, dir);
-		print();
-		attack(knightNum);
+		//print();
+		if(isAttack)attack(knightNum);
 	}
 
 	cout << ans;
