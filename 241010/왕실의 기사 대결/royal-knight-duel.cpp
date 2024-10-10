@@ -27,6 +27,7 @@ struct Knight {
 	int y, x;
 	int h, w;
 	int k;
+	int lost;
 };
 
 int L, N, Q;
@@ -61,30 +62,32 @@ void paintBoard() {
 	}
 }
 
-void attack(int knightNum) {
-	int cur = knightNum;
-	
-	for (int i = 1; i <= N; i++) {
-		if (cur == i) continue;
-		if (knights[i].k <= 0) continue;
-		int y = knights[i].y;
-		int x = knights[i].x;
-		int h = knights[i].h;
-		int w = knights[i].w;
-
-		int trapCount = 0;
-		for (int row = y; row < y + h; row++) {
-			for (int col = x; col < x + w; col++) {
-				if (trap[row][col] == 1) {
-					trapCount++;
-				}
-			}
-		}
-
-		knights[i].k -= trapCount;
-		ans += trapCount;
-	}
-}
+//void attack(int knightNum) {
+//	int cur = knightNum;
+//	
+//	for (int i = 1; i <= N; i++) {
+//		if (cur == i) continue;
+//		if (knights[i].k <= 0) continue;
+//		int y = knights[i].y;
+//		int x = knights[i].x;
+//		int h = knights[i].h;
+//		int w = knights[i].w;
+//
+//		int trapCount = 0;
+//		for (int row = y; row < y + h; row++) {
+//			for (int col = x; col < x + w; col++) {
+//				if (trap[row][col] == 1) {
+//					trapCount++;
+//				}
+//			}
+//		}
+//
+//		knights[i].k -= trapCount;
+//		cout << i<< " : "<<knights[i].k << " , ";
+//		ans += trapCount;
+//	}
+//	cout << "\n";
+//}
 
 bool isPointInTheShield(int pY, int pX, int pH, int pW, int nY, int nX, int nH, int nW) {
 	pair<int, int> points[4];
@@ -192,6 +195,7 @@ bool isMoveChain(int y, int x, int dir) {
 		}
 				//전체 기사들을 순회하면서 
 		for (int n = 1; n <= N; n++) {
+			if (knights[n].k <= 0) continue;
 			if (cur != n) {
 				int nY = knights[n].y;
 				int nX = knights[n].x;
@@ -216,6 +220,31 @@ bool isMoveChain(int y, int x, int dir) {
 		knights[num].y = y;
 		knights[num].x = x;
 	}
+
+	for (auto val : moveKnight) {
+		int num = get<0>(val);
+		if (num == curKnightNum) continue;
+		int y = knights[num].y;
+		int x = knights[num].x;
+		int h = knights[num].h;
+		int w = knights[num].w;
+
+
+		int trapCount = 0;
+		for (int row = y; row < y + h; row++) {
+			for (int col = x; col < x + w; col++) {
+				if (trap[row][col] == 1) {
+					trapCount++;
+				}
+			}
+		}
+
+		knights[num].k -= trapCount;
+		knights[num].lost += trapCount;
+		//cout << i << " : " << knights[i].k << " , ";
+		
+	}
+
 	paintBoard();
 	return true;
 }
@@ -240,6 +269,7 @@ bool move(int knightNum, int dir) {
 	}
 
 	for (int n = 1; n <= N; n++) {
+		if (knights[n].k <= 0) continue;
 		if (knightNum != n) {
 			int nY = knights[n].y;
 			int nX = knights[n].x;
@@ -287,7 +317,12 @@ void print() {
 		}
 		cout << "\n";
 	}
+	for (int i = 1; i <= N; i++) {
+		cout << i << " : " << knights[i].lost << " , ";
+	}
 	cout << "\n";
+	cout << "\n";
+
 }
 
 int main() {
@@ -307,7 +342,7 @@ int main() {
 		knights[i].h = h;
 		knights[i].w = w;
 		knights[i].k = k;
-
+		knights[i].lost = 0;
 		board[r][c] = i;
 	}
 
@@ -319,10 +354,14 @@ int main() {
 
 		//움직여라
 		bool isAttack = move(knightNum, dir);
-		//print();
-		if(isAttack)attack(knightNum);
-	}
 
+		//print();
+		
+	}
+	for (int i = 1; i <= N; i++) {
+		if (knights[i].k <= 0)continue;
+		ans += knights[i].lost;
+	}
 	cout << ans;
 	return 0;
 }
