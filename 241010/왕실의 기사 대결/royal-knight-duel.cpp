@@ -106,8 +106,22 @@ bool isPointInTheShield(int pY, int pX, int pH, int pW, int nY, int nX, int nH, 
 		int nx = npoints[i].second; // npoints의 x좌표
 		int ny = npoints[i].first;  // npoints의 y좌표
 
+		/*cout << points[0].first << " " << ny << " " << points[2].first << "\n";
+		cout << points[0].second << " " << nx << " " << points[1].second << "\n";*/
 		// 직사각형 안에 있는지 확인
 		if (points[0].second <= nx && nx <= points[1].second && points[0].first <= ny && ny <= points[2].first) {
+			return true;
+		}
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int nx = points[i].second; // npoints의 x좌표
+		int ny = points[i].first;  // npoints의 y좌표
+
+		/*cout << points[0].first << " " << ny << " " << points[2].first << "\n";
+		cout << points[0].second << " " << nx << " " << points[1].second << "\n";*/
+		// 직사각형 안에 있는지 확인
+		if (npoints[0].second <= nx && nx <= npoints[1].second && npoints[0].first <= ny && ny <= npoints[2].first) {
 			return true;
 		}
 	}
@@ -207,6 +221,7 @@ bool isMoveChain(int y, int x, int dir) {
 }
 
 bool move(int knightNum, int dir) {
+	//cout << knightNum << " " << dir << "\n";
 	int curMoveY = knights[knightNum].y;
 	int curMoveX = knights[knightNum].x;
 	int curKnightW = knights[knightNum].w;
@@ -220,7 +235,24 @@ bool move(int knightNum, int dir) {
 		for (int j = willMoveX; j < willMoveX + curKnightW; j++) {
 			if (oob(i,j)) return false;
 			if (trap[i][j] == 2)return false;
-			if (board[i][j] != knightNum && board[i][j] >= 1 && trap[i][j] != 2) isBoundary = true;
+			//if (board[i][j] != knightNum && board[i][j] >= 1 && trap[i][j] != 2) isBoundary = true;
+		}
+	}
+
+	for (int n = 1; n <= N; n++) {
+		if (knightNum != n) {
+			int nY = knights[n].y;
+			int nX = knights[n].x;
+			int nH = knights[n].h;
+			int nW = knights[n].w;
+			//움직인 기사의 방패가 i 기사와 겹친다면
+			if (isPointInTheShield(willMoveY, willMoveX, curKnightH, curKnightW, nY, nX, nH, nW)) {
+				//cout << "boundary\n";
+				isBoundary = true;
+			}
+			else {
+				//cout << "no\n";
+			}
 		}
 	}
 
