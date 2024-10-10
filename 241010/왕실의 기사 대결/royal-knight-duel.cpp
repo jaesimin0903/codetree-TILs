@@ -217,8 +217,9 @@ bool move(int knightNum, int dir) {
 
 	bool isBoundary = false;
 	for (int i = willMoveY; i < willMoveY + curKnightH; i++) {
-		if (oob(willMoveY + curKnightH - 1, willMoveX + curKnightW - 1)) isBoundary = true;
 		for (int j = willMoveX; j < willMoveX + curKnightW; j++) {
+			if (oob(i,j)) return false;
+			if (trap[i][j] == 2)return false;
 			if (board[i][j] != knightNum && board[i][j] >= 1 && trap[i][j] != 2) isBoundary = true;
 		}
 	}
