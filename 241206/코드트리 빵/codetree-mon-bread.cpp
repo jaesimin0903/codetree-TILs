@@ -149,7 +149,7 @@ void movePeople() {
                 int nx = x + dx[d];
                 if (oob(ny, nx)) continue;
                 if (visited[ny][nx]) continue;
-                if (map[ny][nx] == 3) continue; // 다른 사람이 점유한 경우 이동 불가
+                if (map[ny][nx] == 3 || map[ny][nx] ==2) continue; // 다른 사람이 점유한 경우 이동 불가
 
                 visited[ny][nx] = true;
                 before[ny][nx] = { y, x }; // 이전 좌표 저장
