@@ -103,7 +103,7 @@ void startBasecamp(int day) {
             if (minBasecamp.first > basecamp.first) {
                 minBasecamp = basecamp;
             }
-            else {
+            else if(minBasecamp.first == basecamp.first){
                 if (minBasecamp.second > basecamp.second){
                     minBasecamp = basecamp;
                 }
@@ -191,7 +191,7 @@ void scanMart() {
 bool check() {
     bool isAllFinish = true;
     for (int i = 1; i <= M; i++) {
-        //cout << "person " << i << " " <<people[i].y << " " << people[i].x << " | "<< people[i].ty << " " << people[i].tx << " "<< people[i].isFinish << " ";
+//        cout << "person " << i << " " <<people[i].y << " " << people[i].x << " | "<< people[i].ty << " " << people[i].tx << " "<< people[i].isFinish << " ";
         if (!people[i].isFinish) isAllFinish = false;
     }
     //cout << "\n";
