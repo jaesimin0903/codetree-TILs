@@ -95,7 +95,7 @@ void startBasecamp(int day) {
         if (map[basecamp.first][basecamp.second] == 3)continue;
         int dis = bfs(martY, martX, basecamp.first, basecamp.second);
         //cout <<"bfs val " << dis << " positoin " << basecamp.first << " " << basecamp.second << "\n";
-        if (shortestDis > dis) {
+        if (dis != -1 && shortestDis > dis) {
             shortestDis = dis;
             minBasecamp = basecamp;
         }
