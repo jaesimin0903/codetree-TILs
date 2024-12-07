@@ -143,12 +143,12 @@ bool razor(Tower& attackTower, Tower& defenceTower) {
         q.pop();
         
         if (y == dY && x == dX) {
-        
+            //cout << "razor\n";
             pair<int, int> trace = { dY, dX };
             map[dY][dX].second -= (attackTower.attack + N + M);
             while (!(before[trace.first][trace.second].first == aY && before[trace.first][trace.second].second == aX)) {
                 trace = before[trace.first][trace.second];
-        
+                
                 map[trace.first][trace.second].second -= (attackTower.attack + N +M) / 2;
                 towers[map[trace.first][trace.second].first].isAction = true;
             }
@@ -207,7 +207,7 @@ void repair() {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++){
             if (map[i][j].first == -1)continue;
-            if (!towers[map[i][j].first].isAction) {
+            if (!towers[map[i][j].first].isAction && map[i][j].second > 0) {
  //               cout << "REPAIR IDX " << map[i][j].first << "\n";
                 towers[map[i][j].first].attack += 1;
                 map[i][j].second++;
@@ -267,14 +267,29 @@ void init() {
     }
 }
 
-void findKingTower() {
+int findKingTower() {
+    int cnt = 0;
     int maxAttack = 0;
     for (auto t : towers) {
         if (!t.isDead) {
+            cnt++;
             maxAttack = max(maxAttack, t.attack);
         }
     }
-    cout << maxAttack << '\n';
+
+    return maxAttack;
+}
+
+bool onlyOne() {
+    int cnt = 0;
+    for (auto t : towers) {
+        if (!t.isDead) {
+            cnt++;
+        }
+    }
+
+    if (cnt <= 1) return true;
+    return false;
 }
 
 void setMap() {
@@ -286,19 +301,29 @@ void setMap() {
 }
 
 void simulation() {
-    while (day++ < K) {
+    while (day++ < K && !onlyOne()) {
         //cout << "\n------------------GOOD MORING DAY "<< day <<" ---------------------\n";
         //debug();
         attack();
         //cout << "\n------------------AFTER ATTACK---------------------\n";
         //debug();
+
+        int cnt = 0;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (map[i][j].second > 0)cnt++;
+            }
+        }
+        if (cnt <= 1) {
+            break;
+        }
         repair();
         towerSetting();
         //cout << "\n";
         setMap();
         //cout << "\n------------------GOOD BYE---------------------\n";
     }
-    findKingTower();
+    cout << findKingTower();
 }
 int main() {
     // 여기에 코드를 작성해주세요.
