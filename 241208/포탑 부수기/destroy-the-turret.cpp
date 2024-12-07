@@ -56,10 +56,10 @@ void debug() {
     }
 }
 pair<int,int> oob(int y, int x) {
-    if (y < 0) y = M - 1;
-    else if (y >= M) y = 0;
-    else if (x < 0) x = N - 1;
-    else if (x >= N) x = 0;
+    if (y < 0) y = N - 1;
+    else if (y >= N) y = 0;
+    if (x < 0) x = M - 1;
+    else if (x >= M) x = 0;
     return { y,x };
 }
 
@@ -137,10 +137,12 @@ bool razor(Tower& attackTower, Tower& defenceTower) {
         int y = q.front().first;
         int x = q.front().second;
 
+        
+
         q.pop();
         
         if (y == dY && x == dX) {
-            //cout << "razor\n";
+        
             pair<int, int> trace = { dY, dX };
             map[dY][dX].second -= (attackTower.attack + N + M);
             while (!(before[trace.first][trace.second].first == aY && before[trace.first][trace.second].second == aX)) {
@@ -157,7 +159,7 @@ bool razor(Tower& attackTower, Tower& defenceTower) {
             int nx = x + dx[d];
             ny = oob(ny, nx).first;
             nx = oob(ny, nx).second;
-            //cout << "BFS DIR " << ny << " " << nx << "\n";
+        
             if (visited[ny][nx]) continue;
             
             if (map[ny][nx].second == DEAD) continue;
@@ -315,8 +317,8 @@ void setMap() {
     for (auto t : towers) {
         map[t.y][t.x] = { t.idx, t.attack };
     }
-    /*debug();
-    cout << "\n";*/
+    //debug();
+    //cout << "\n";
 }
 
 void simulation() {
@@ -327,15 +329,15 @@ void simulation() {
         attack();
         towerSetting1();
         setMap();
-        //int cnt = 0;
-        //for (int i = 0; i < N; i++) {
-        //    for (int j = 0; j < M; j++) {
-        //        if (map[i][j].second > 0)cnt++;
-        //    }
-        //}
-        //if (cnt <= 1) {
-        //    break;
-        //}
+        int cnt = 0;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (map[i][j].second > 0)cnt++;
+            }
+        }
+        if (cnt <= 1) {
+            break;
+        }
 
         repair();
         towerSetting2();
