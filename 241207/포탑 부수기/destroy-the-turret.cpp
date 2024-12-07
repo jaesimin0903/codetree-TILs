@@ -216,7 +216,25 @@ void repair() {
     }
 }
 
-void towerSetting() {
+void towerSetting1() {
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < M; j++) {
+            int towerIdx = map[i][j].first;
+            if (towerIdx == -1) continue;
+            if (map[i][j].second <= 0 && !towers[towerIdx].isDead) {
+                towers[towerIdx].attack = 0;
+                towers[towerIdx].isDead = true;
+            }
+            else {
+                towers[towerIdx].attack = map[i][j].second;
+                //towers[towerIdx].isAction = false;
+            }
+        }
+    }
+}
+
+void towerSetting2() {
     
     for (int i = 0; i <N; i++) {
         for (int j = 0; j < M; j++) {
@@ -297,7 +315,8 @@ void setMap() {
     for (auto t : towers) {
         map[t.y][t.x] = { t.idx, t.attack };
     }
-    //debug();
+    /*debug();
+    cout << "\n";*/
 }
 
 void simulation() {
@@ -305,9 +324,8 @@ void simulation() {
         //cout << "\n------------------GOOD MORING DAY "<< day <<" ---------------------\n";
         //debug();
         attack();
-        //cout << "\n------------------AFTER ATTACK---------------------\n";
-        //debug();
-
+        towerSetting1();
+        setMap();
         int cnt = 0;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < M; j++) {
@@ -317,11 +335,14 @@ void simulation() {
         if (cnt <= 1) {
             break;
         }
+
         repair();
-        towerSetting();
-        //cout << "\n";
+        towerSetting2();
         setMap();
-        //cout << "\n------------------GOOD BYE---------------------\n";
+        //cout << "\n------------------AFTER ATTACK---------------------\n";
+        //debug();
+
+
     }
     cout << findKingTower();
 }
