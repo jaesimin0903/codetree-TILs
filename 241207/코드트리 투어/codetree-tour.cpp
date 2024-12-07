@@ -23,7 +23,9 @@ int n, m;
 int startCity = 0;
 
 unordered_map<int, Plan> um;
+unordered_map<int, bool> isAlive;
 vector<vector<pair<int, int>>> graph;
+priority_queue<pair<int, int>, vector<pair<int, int>>, Compare>sellPlanPQ;
 int cost[2010];
 
 
@@ -37,32 +39,35 @@ void createPlan(int id, int rev, int dest) {
     p.dest = dest;
     p.cost = cost[dest];
     um[id] = p;
+    isAlive[id] = true;
+    if (p.revenue - p.cost >= 0)
+        sellPlanPQ.push({ p.revenue - p.cost, p.id });
 }
 
 void deletePlan(int id) {
     um.erase(id);
+    isAlive[id] = false;
 }
 
 int sellPlan() {
     //djikstra
 
-    priority_queue<pair<int, int>, vector<pair<int, int>>, Compare>pq;
-
-    for (auto i = um.begin(); i != um.end(); i++) {
-        int dest = i->second.dest;
-        int revenue = i->second.revenue;
-        int id = i->second.id;
-        int c = i->second.cost;
-        if (revenue - c >= 0) {
-            pq.push({ revenue-c, id });
+    while (!sellPlanPQ.empty()) {
+        if (!isAlive[sellPlanPQ.top().second])sellPlanPQ.pop();
+        else {
+            isAlive[sellPlanPQ.top().second] = false;
+            return sellPlanPQ.top().second;
         }
     }
 
-    if (!pq.empty()) {
+    return -1;
+
+
+    /*if (!pq.empty()) {
         deletePlan(pq.top().second);
         return pq.top().second;
     }
-    else return -1;
+    else return -1;*/
 }
 
 void setAllStart(int start) {
@@ -99,6 +104,22 @@ void setAllStart(int start) {
     for (auto i = um.begin(); i != um.end(); i++) {
         Plan& p = i->second;
         p.cost = cost[p.dest];
+    }
+
+    while (!sellPlanPQ.empty()) {
+        sellPlanPQ.pop();
+    }
+
+    //출발지가 초기화되면 추가
+    for (auto i = um.begin(); i != um.end(); i++) {
+        int dest = i->second.dest;
+        int revenue = i->second.revenue;
+        int id = i->second.id;
+        int c = i->second.cost;
+        if (!isAlive[id])continue;
+        if (revenue - c >= 0) {
+            sellPlanPQ.push({ revenue-c, id });
+        }
     }
 }
 
